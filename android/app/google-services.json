@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "907237369449",
+    "project_id": "graphguard-2e86a",
+    "storage_bucket": "graphguard-2e86a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:907237369449:android:3ad9f728e05bcbd49464f8",
+        "android_client_info": {
+          "package_name": "com.example.graph_guard"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBz6SNyCubbBrQVGwaloxfu2V14T_Nx4mo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
