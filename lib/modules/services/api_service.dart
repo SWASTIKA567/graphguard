@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:graph_guard/repomodel.dart';
 import 'package:http/http.dart' as http;
 import 'package:get_storage/get_storage.dart';
@@ -51,13 +52,20 @@ class ApiService {
         Uri.parse("$baseUrl/api/repos"),
         headers: headers,
       );
+      log("==== API DEBUG START ====");
+      log("STATUS CODE: ${res.statusCode}");
+      log("RESPONSE BODY: ${res.body}");
+      log("TOKEN USED: $token");
+      log("==== API DEBUG END ====");
 
       final data = jsonDecode(res.body);
 
       if (res.statusCode == 200) {
-        return (data as List).map((e) => RepoModel.fromJson(e)).toList();
+        final parsed = data is List ? data : data["data"];
+
+        return (parsed as List).map((e) => RepoModel.fromJson(e)).toList();
       } else {
-        throw Exception("Failed to fetch repos");
+        throw Exception(data["message"] ?? "Failed to fetch repos");
       }
     } catch (e) {
       throw Exception("Repo Error: $e");
