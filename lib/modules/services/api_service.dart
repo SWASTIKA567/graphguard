@@ -1,16 +1,15 @@
 import 'dart:convert';
+import 'package:graph_guard/repomodel.dart';
 import 'package:http/http.dart' as http;
 import 'package:get_storage/get_storage.dart';
 
 class ApiService {
-
-  static const String baseUrl = "http://10.0.2.2:5000";
+  static const String baseUrl = "https://graphguardians-backend.onrender.com";
 
   static final box = GetStorage();
 
   static String? get token => box.read("token");
 
-  
   static Map<String, String> get headers {
     final t = token;
 
@@ -20,23 +19,20 @@ class ApiService {
     };
   }
 
-  
   static Future<Map<String, dynamic>> login(
-      String email, String password) async {
+    String email,
+    String password,
+  ) async {
     try {
       final res = await http.post(
         Uri.parse("$baseUrl/api/auth/login"),
         headers: {"Content-Type": "application/json"},
-        body: jsonEncode({
-          "email": email,
-          "password": password,
-        }),
+        body: jsonEncode({"email": email, "password": password}),
       );
 
       final data = jsonDecode(res.body);
 
       if (res.statusCode == 200) {
-        
         box.write("token", data["token"]);
         box.write("user", data["user"]);
 
@@ -49,8 +45,7 @@ class ApiService {
     }
   }
 
-  
-  static Future<List<dynamic>> getRepos() async {
+  static Future<List<RepoModel>> getRepos() async {
     try {
       final res = await http.get(
         Uri.parse("$baseUrl/api/repos"),
@@ -60,16 +55,15 @@ class ApiService {
       final data = jsonDecode(res.body);
 
       if (res.statusCode == 200) {
-        return data["repos"];
+        return (data as List).map((e) => RepoModel.fromJson(e)).toList();
       } else {
-        throw Exception(data["message"] ?? "Failed to fetch repos");
+        throw Exception("Failed to fetch repos");
       }
     } catch (e) {
       throw Exception("Repo Error: $e");
     }
   }
 
-  
   static Future<void> saveDeviceToken(String fcmToken) async {
     try {
       final res = await http.post(
@@ -85,7 +79,6 @@ class ApiService {
       print("FCM Save Error: $e");
     }
   }
-
 
   static void logout() {
     box.remove("token");
