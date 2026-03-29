@@ -7,63 +7,62 @@ class LoginScreen extends StatelessWidget {
 
   final LoginController controller = Get.put(LoginController());
 
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                "GraphGuard ",
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-
-              SizedBox(height: 30),
-
-              TextField(
-                controller: emailController,
-                decoration: InputDecoration(
-                  labelText: "Email",
-                  border: OutlineInputBorder(),
+          child: Obx(
+            () => Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                /// 🔥 App Title
+                const Text(
+                  "GraphGuard",
+                  style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
                 ),
-              ),
 
-              SizedBox(height: 15),
+                const SizedBox(height: 20),
 
-              TextField(
-                controller: passwordController,
-                obscureText: true,
-                decoration: InputDecoration(
-                  labelText: "Password",
-                  border: OutlineInputBorder(),
+                /// Subtitle
+                const Text(
+                  "Secure your GitHub repositories",
+                  style: TextStyle(color: Colors.grey),
                 ),
-              ),
 
-              SizedBox(height: 25),
+                const SizedBox(height: 40),
 
-              Obx(() {
-                return controller.isLoading.value
-                    ? CircularProgressIndicator()
-                    : SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            controller.login(
-                              emailController.text.trim(),
-                              passwordController.text.trim(),
-                            );
-                          },
-                          child: Text("Login"),
-                        ),
-                      );
-              }),
-            ],
+                /// 🔥 GitHub Button
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: controller.isLoading.value
+                        ? null
+                        : controller.loginWithGithub,
+
+                    icon: const Icon(Icons.code),
+
+                    label: controller.isLoading.value
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Text("Continue with GitHub"),
+
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
