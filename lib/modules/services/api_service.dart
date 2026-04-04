@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:graph_guard/repomodel.dart';
 import 'package:http/http.dart' as http;
 import 'package:get_storage/get_storage.dart';
+import '../dashboard/dashboard_model.dart';
 
 class ApiService {
   static const String baseUrl = "https://graphguardians-backend.onrender.com";
@@ -13,7 +14,6 @@ class ApiService {
 
   static Map<String, String> get headers {
     final t = token;
-
     return {
       "Content-Type": "application/json",
       if (t != null) "Authorization": "Bearer $t",
@@ -30,13 +30,10 @@ class ApiService {
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({"email": email, "password": password}),
       );
-
       final data = jsonDecode(res.body);
-
       if (res.statusCode == 200) {
         box.write("token", data["token"]);
         box.write("user", data["user"]);
-
         return data;
       } else {
         throw Exception(data["message"] ?? "Login failed");
@@ -59,10 +56,8 @@ class ApiService {
       log("==== API DEBUG END ====");
 
       final data = jsonDecode(res.body);
-
       if (res.statusCode == 200) {
         final parsed = data is List ? data : data["data"];
-
         return (parsed as List).map((e) => RepoModel.fromJson(e)).toList();
       } else {
         throw Exception(data["message"] ?? "Failed to fetch repos");
@@ -72,13 +67,12 @@ class ApiService {
     }
   }
 
-  static Future<Map<String, dynamic>?> getDashboard(String repoId) async {
+  static Future<DashboardModel?> getDashboard(String repoId) async {
     try {
       final res = await http.get(
         Uri.parse("$baseUrl/api/dashboard/$repoId"),
         headers: headers,
       );
-
       log("==== DASHBOARD API DEBUG START ====");
       log("URL: $baseUrl/api/dashboard/$repoId");
       log("STATUS CODE: ${res.statusCode}");
@@ -87,15 +81,38 @@ class ApiService {
       log("==== DASHBOARD API DEBUG END ====");
 
       final data = jsonDecode(res.body);
-
       if (res.statusCode == 200) {
-        return data;
+        return DashboardModel.fromJson(data);
       } else {
         throw Exception(data["message"] ?? "Failed to fetch dashboard");
       }
     } catch (e) {
       log("Dashboard Error: $e");
       return null;
+    }
+  }
+
+  // ✅ NEW - Vulnerabilities fetch
+  static Future<List<dynamic>> getVulnerabilities(String repoId) async {
+    try {
+      final res = await http.get(
+        Uri.parse("$baseUrl/api/vulnerabilities/$repoId"),
+        headers: headers,
+      );
+      log("==== VULN API DEBUG START ====");
+      log("STATUS CODE: ${res.statusCode}");
+      log("RESPONSE BODY: ${res.body}");
+      log("==== VULN API DEBUG END ====");
+
+      final data = jsonDecode(res.body);
+      if (res.statusCode == 200) {
+        return data['vulnerabilities'] ?? data ?? [];
+      } else {
+        throw Exception(data["message"] ?? "Failed to fetch vulnerabilities");
+      }
+    } catch (e) {
+      log("Vulnerabilities Error: $e");
+      return [];
     }
   }
 
@@ -106,12 +123,11 @@ class ApiService {
         headers: headers,
         body: jsonEncode({"token": fcmToken}),
       );
-
       if (res.statusCode != 200) {
         throw Exception("Failed to save FCM token");
       }
     } catch (e) {
-      print("FCM Save Error: $e");
+      log("FCM Save Error: $e");
     }
   }
 

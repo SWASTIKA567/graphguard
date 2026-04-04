@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:graph_guard/modules/services/api_service.dart';
@@ -59,7 +61,8 @@ class RepoListScreen extends StatelessWidget {
                 trailing: const Icon(Icons.arrow_forward_ios),
 
                 onTap: () {
-                  Get.toNamed("/dashboard", arguments: repo.id);
+                  log("RepoId clicked: ${repo}");
+                  Get.toNamed("/dashboard", arguments: repo);
                 },
               ),
             );
